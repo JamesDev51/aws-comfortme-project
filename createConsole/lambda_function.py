@@ -63,7 +63,7 @@ def lambda_handler(event, context):
         }
         conductSqlQuery(sql,sqlData)
         
-        result={'status':HTTPStatus.OK}
+        result={'statusCode':HTTPStatus.OK}
         print("createConsole lambda_handler function done")
         print("--------------------------------")
         return result
