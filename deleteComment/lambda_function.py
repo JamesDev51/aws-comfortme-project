@@ -33,16 +33,16 @@ def lambda_handler(event, context):
     
     try:
         print("--------------------------------")
-        print("deleteConsole lambda_handler function init")
+        print("deleteComment lambda_handler function init")
         
         params=event['queryStringParameters']
-        consoleId=params["consoleId"]
+        commentId=params["commentId"]
         
-        sql = "DELETE FROM console WHERE consoleId=%s"
-        conductSqlQuery(sql, consoleId)
+        sql = "DELETE FROM console WHERE commentId=%s"
+        conductSqlQuery(sql, commentId)
         
         result={"statusCode":HTTPStatus.OK}
-        print("deleteConsole lambda_handler function done")
+        print("deleteComment lambda_handler function done")
         print("--------------------------------")
         return result
     except Exception:
