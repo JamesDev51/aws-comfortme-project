@@ -31,8 +31,7 @@ def lambda_handler(event, context):
     try:
         print("--------------------------------")
         print("createConsole lambda_handler function init")
-        # data=json.loads(event['body'])
-        data=event['body']
+        data=json.loads(event['body'])
         
         request=data['request']
         email=data['email']
