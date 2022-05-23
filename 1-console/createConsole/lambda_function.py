@@ -37,19 +37,18 @@ def lambda_handler(event, context):
         email=data['email']
         print(f"request : {request}   email : {email}")
         
-        '''
-        TODO : chatbot으로부터 받아오는 부분 fixing 필요 
         headers = {'Content-Type': 'application/json; charset=utf-8'}
-        response=requests.post('https://opgftpltze.execute-api.ap-northeast-2.amazonaws.com/default/console_chatbot', headers=headers,timeout=40,json={'request':request})
-        print("response : ",response.json())
-        '''
+        retVal=requests.post('https://0mo7o614ha.execute-api.ap-northeast-2.amazonaws.com/dev/console-chatbot', headers=headers,timeout=60,json={'request':request})
+        print("retVal : ",retVal.json())
+        retVal=retVal.json()
+        # retVal=json.loads(retVal, encoding="utf-8")
         
-        response="수고하셨어요" #임시 response
-        division=1 #임시 div
-        simRequest="남편이 저에게 안좋게 말해요" #임시 simRequest
-        simRate=0.98384 #임시 simRate
-        print(f"response : {response}   division : {division}   simRequest : {simRequest}   simRate : {simRate}")
-    
+        
+        response=retVal['response']
+        division=retVal['division']
+        simRequest=retVal['simRequest']
+        simRate=retVal['simRate'] 
+        
 
         
         sql = "INSERT INTO console(request,response,email,division,simRequest,simRate) VALUES(%(request)s,%(response)s,%(email)s,%(division)s,%(simRequest)s,%(simRate)s)"
@@ -63,7 +62,11 @@ def lambda_handler(event, context):
         }
         conductSqlQuery(sql,sqlData)
         
-        result={'statusCode':HTTPStatus.OK}
+        retVal['request']=request
+        retVal['email']=email
+        
+        
+        result={'statusCode':HTTPStatus.OK,'body':json.dumps(retVal,ensure_ascii=False)}
         print("createConsole lambda_handler function done")
         print("--------------------------------")
         return result
