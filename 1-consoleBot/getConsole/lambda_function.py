@@ -17,32 +17,40 @@ def getMysqlConn():
             password=DB_PASSWORD, 
             db=DB_NAME)
 
-
-def  conductSqlQuery(sql, sqlData):
+def  conductSqlQuery(sql,sqlData):
     print("--------------------------------")
     print("conductSqlQuery function init")
     conn=getMysqlConn()
     curs = conn.cursor()
-    curs.execute(sql, sqlData) 
-    conn.commit()
+    with conn:
+        with conn.cursor(pymysql.cursors.DictCursor) as cur:
+                cur.execute(sql,sqlData)
+                result = json.dumps(cur.fetchall(),default=json_default,ensure_ascii = False)
     print("conductSqlQuery function done")
     print("--------------------------------")
+    return result
 
+def json_default(value): 
+    if isinstance(value, datetime.date): 
+        return value.strftime('%Y-%m-%d %H:%M:%S') 
+    raise TypeError('not JSON serializable')
 
 def lambda_handler(event, context):
-    
     try:
         print("--------------------------------")
-        print("deleteComment lambda_handler function init")
-        
+        print("getConsole lambda_handler function init")
         params=event['queryStringParameters']
-        commentId=params["commentId"]
+        consoleBotId=params['consoleBotId']
+        print("consoleBotId : ",consoleBotId)
         
-        sql = "DELETE FROM Comment WHERE commentId=%s"
-        conductSqlQuery(sql, commentId)
+        sql = "SELECT * FROM ConsoleBot WHERE consoleBotId= %s"
+        retValue=conductSqlQuery(sql,consoleBotId)
         
-        result={"statusCode":HTTPStatus.OK}
-        print("deleteComment lambda_handler function done")
+        result={
+            'statusCode':HTTPStatus.OK,
+            'body':retValue
+        }
+        print("getConsole lambda_handler function done")
         print("--------------------------------")
         return result
     except Exception:

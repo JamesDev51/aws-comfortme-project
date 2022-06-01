@@ -22,7 +22,7 @@ def  conductSqlQuery(sql, sqlData):
     print("conductSqlQuery function init")
     conn=getMysqlConn()
     curs = conn.cursor()
-    curs.execute(sql, sqlData) 
+    curs.execute(sql, sqlData)
     conn.commit()
     print("conductSqlQuery function done")
     print("--------------------------------")
@@ -30,25 +30,31 @@ def  conductSqlQuery(sql, sqlData):
 def lambda_handler(event, context):
     try:
         print("--------------------------------")
-        print("createComment lambda_handler function init")
+        print("createConsolePost lambda_handler function init")
+        print("event : ",event)
+        
+        title=event['title']
         contents=event['contents']
-        consolePostId=event['consolePostId']
         email=event['email']
         anonymous=event['anonymous']
-        print(f"contents : {contents}  consolePostId : {consolePostId}   email : {email}  anonymous : {anonymous}")
+        mainCategory=event['mainCategory']
+        subCategory=event['subCategory']
+        print(f"title : {title}   contents : {contents}   anonymous : {anonymous}   mainCategory : {mainCategory}   subCategory : {subCategory}")
         
-        
-        sql = "INSERT INTO Comment(contents,consolePostId,email,anonymous) VALUES(%(contents)s,%(consolePostId)s,%(email)s,%(anonymous)s)"
+        sql = "INSERT INTO ConsolePost(title,contents,email,anonymous,mainCategory,subCategory) VALUES(%(title)s,%(contents)s,%(email)s,%(anonymous)s,%(mainCategory)s,%(subCategory)s)"
         sqlData={
+            'title':title,
             'contents':contents,
-            'consolePostId':consolePostId,
             'email':email,
-            'anonymous':anonymous
+            'anonymous':anonymous,
+            'mainCategory':mainCategory,
+            'subCategory':subCategory
         }
         conductSqlQuery(sql,sqlData)
         
+        
         result={'statusCode':HTTPStatus.OK}
-        print("createComment lambda_handler function done")
+        print("createConsolePost lambda_handler function done")
         print("--------------------------------")
         return result
     except Exception:

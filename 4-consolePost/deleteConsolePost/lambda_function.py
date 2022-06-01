@@ -8,7 +8,7 @@ from http import HTTPStatus
 DB_HOST="db-team8-consolation.c8fut6pj2ay8.ap-northeast-2.rds.amazonaws.com"
 DB_USER="root"
 DB_PASSWORD="1tkddydwkdql"
-DB_NAME="comfortmeDB"
+DB_NAME="helpmeDB"
 
 def getMysqlConn():
     return pymysql.connect(
@@ -33,16 +33,16 @@ def lambda_handler(event, context):
     
     try:
         print("--------------------------------")
-        print("deleteComment lambda_handler function init")
+        print("deleteConsole lambda_handler function init")
         
         params=event['queryStringParameters']
-        commentId=params["commentId"]
+        consoleId=params["consoleId"]
         
-        sql = "DELETE FROM Comment WHERE commentId=%s"
-        conductSqlQuery(sql, commentId)
+        sql = "DELETE FROM console WHERE consoleId=%s"
+        conductSqlQuery(sql, consoleId)
         
         result={"statusCode":HTTPStatus.OK}
-        print("deleteComment lambda_handler function done")
+        print("deleteConsole lambda_handler function done")
         print("--------------------------------")
         return result
     except Exception:

@@ -8,7 +8,7 @@ from http import HTTPStatus
 DB_HOST="db-team8-consolation.c8fut6pj2ay8.ap-northeast-2.rds.amazonaws.com"
 DB_USER="root"
 DB_PASSWORD="1tkddydwkdql"
-DB_NAME="helpmeDB"
+DB_NAME="comfortmeDB"
 
 def getMysqlConn():
     return pymysql.connect(
@@ -32,7 +32,7 @@ def  conductSqlQuery(sql,sqlData):
 
 def json_default(value): 
     if isinstance(value, datetime.date): 
-        return value.strftime('%Y-%m-%d') 
+        return value.strftime('%Y-%m-%d %H:%M:%S') 
     raise TypeError('not JSON serializable')
 
 def lambda_handler(event, context):
@@ -41,12 +41,12 @@ def lambda_handler(event, context):
         print("getComments lambda_handler function init")
 
         params=event['queryStringParameters']
-        consoleId=params['consoleId']
-        print("consoleId : ",consoleId)
+        consolePostId=params['consolePostId']
+        print("consolePostId : ",consolePostId)
 
         conn=getMysqlConn()
-        sql = "SELECT * FROM comment WHERE consoleId=%s"
-        retValue=conductSqlQuery(sql,consoleId)
+        sql = "SELECT * FROM Comment WHERE consolePostId=%s"
+        retValue=conductSqlQuery(sql,consolePostId)
         
         result={
             'statusCode':HTTPStatus.OK,
