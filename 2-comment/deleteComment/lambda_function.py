@@ -41,7 +41,12 @@ def lambda_handler(event, context):
         sql = "DELETE FROM Comment WHERE commentId=%s"
         conductSqlQuery(sql, commentId)
         
-        result={"statusCode":HTTPStatus.OK}
+        result={
+            "statusCode":HTTPStatus.OK,
+            'headers': {
+            'Access-Control-Allow-Origin': '*',
+            }
+        }
         print("deleteComment lambda_handler function done")
         print("--------------------------------")
         return result

@@ -48,6 +48,9 @@ def lambda_handler(event, context):
         
         result={
             'statusCode':HTTPStatus.OK,
+            'headers': {
+            'Access-Control-Allow-Origin': '*',
+            },
             'body':retValue
         }
         print("getConsole lambda_handler function done")

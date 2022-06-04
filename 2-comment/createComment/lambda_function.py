@@ -31,10 +31,12 @@ def lambda_handler(event, context):
     try:
         print("--------------------------------")
         print("createComment lambda_handler function init")
-        contents=event['contents']
-        consolePostId=event['consolePostId']
-        email=event['email']
-        anonymous=event['anonymous']
+        data=json.loads(event['body'])
+        
+        contents=data['contents']
+        consolePostId=data['consolePostId']
+        email=data['email']
+        anonymous=data['anonymous']
         print(f"contents : {contents}  consolePostId : {consolePostId}   email : {email}  anonymous : {anonymous}")
         
         
@@ -47,7 +49,12 @@ def lambda_handler(event, context):
         }
         conductSqlQuery(sql,sqlData)
         
-        result={'statusCode':HTTPStatus.OK}
+        result={
+            'statusCode':HTTPStatus.OK,
+            'headers': {
+            'Access-Control-Allow-Origin': '*',
+            },
+        }
         print("createComment lambda_handler function done")
         print("--------------------------------")
         return result

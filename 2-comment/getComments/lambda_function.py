@@ -50,6 +50,9 @@ def lambda_handler(event, context):
         
         result={
             'statusCode':HTTPStatus.OK,
+            'headers': {
+            'Access-Control-Allow-Origin': '*',
+            },
             'body':retValue
         }
         print("getComments lambda_handler function done")

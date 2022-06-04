@@ -76,7 +76,12 @@ def lambda_handler(event, context):
         sql = "INSERT INTO CheerUp(consolePostId,email) VALUES(%(consolePostId)s,%(email)s)"
         conductSqlQuery2(sql,sqlData)
         
-        result={'statusCode':HTTPStatus.OK}
+        result={
+            'statusCode':HTTPStatus.OK,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+            }
+        }
         print("createCheerUp lambda_handler function done")
         print("--------------------------------")
         return result

@@ -36,12 +36,14 @@ def lambda_handler(event, context):
         print("createConsolePost lambda_handler function init")
         print("event : ",event)
         
-        title=event['title']
-        contents=event['contents']
-        email=event['email']
-        anonymous=event['anonymous']
-        mainCategory=event['mainCategory']
-        subCategory=event['subCategory']
+        data=json.loads(event['body'])
+        
+        title=data['title']
+        contents=data['contents']
+        email=data['email']
+        anonymous=data['anonymous']
+        mainCategory=data['mainCategory']
+        subCategory=data['subCategory']
         print(f"title : {title}   contents : {contents}   anonymous : {anonymous}   mainCategory : {mainCategory}   subCategory : {subCategory}")
         
         comprehend = boto3.client(service_name='comprehend', region_name='ap-northeast-2',aws_access_key_id='AKIAUI2WSCLQZYBOH6L7', aws_secret_access_key='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')
@@ -65,7 +67,10 @@ def lambda_handler(event, context):
         conductSqlQuery(sql,sqlData)
         
         
-        result={'statusCode':HTTPStatus.OK}
+        result={'statusCode':HTTPStatus.OK,'headers': {
+                'Access-Control-Allow-Origin': '*',
+            }
+        }
         print("createConsolePost lambda_handler function done")
         print("--------------------------------")
         return result

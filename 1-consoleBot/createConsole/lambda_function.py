@@ -33,8 +33,9 @@ def lambda_handler(event, context):
         print("createConsole lambda_handler function init")
         print("event : ",event)
         
-        request=event['request']
-        email=event['email']
+        data=json.loads(event['body'])
+        request=data['request']
+        email=data['email']
         print(f"request : {request}   email : {email}")
         
         headers = {'Content-Type': 'application/json; charset=utf-8'}
@@ -66,8 +67,14 @@ def lambda_handler(event, context):
         retVal['email']=email
         
         
+        result={
+        'statusCode':HTTPStatus.OK,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+        },
+        'body':json.dumps(retVal),
+        }
         
-        result={'statusCode':HTTPStatus.OK,'request':request,'response':response,'simRate':simRate,'division':division}
         print("createConsole lambda_handler function done")
         print("--------------------------------")
         return result

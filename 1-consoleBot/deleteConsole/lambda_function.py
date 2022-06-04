@@ -36,12 +36,17 @@ def lambda_handler(event, context):
         print("deleteConsole lambda_handler function init")
         
         params=event['queryStringParameters']
-        consoleId=params["consoleId"]
+        consoleBotId=params["consoleBotId"]
         
         sql = "DELETE FROM console WHERE consoleId=%s"
-        conductSqlQuery(sql, consoleId)
+        conductSqlQuery(sql, consoleBotId)
         
-        result={"statusCode":HTTPStatus.OK}
+        result={
+            'statusCode':HTTPStatus.OK,
+            'headers': {
+            'Access-Control-Allow-Origin': '*',
+            }
+        }
         print("deleteConsole lambda_handler function done")
         print("--------------------------------")
         return result
