@@ -2,6 +2,7 @@ import json
 import sys
 import logging
 import pymysql
+import boto3
 from http import HTTPStatus
 import requests
 
@@ -9,6 +10,8 @@ DB_HOST="db-team8-consolation.c8fut6pj2ay8.ap-northeast-2.rds.amazonaws.com"
 DB_USER="root"
 DB_PASSWORD="1tkddydwkdql"
 DB_NAME="comfortmeDB"
+
+
 
 def getMysqlConn():
     return pymysql.connect(
@@ -23,59 +26,63 @@ def  conductSqlQuery(sql, sqlData):
     conn=getMysqlConn()
     curs = conn.cursor()
     curs.execute(sql, sqlData)
+    consolePostId=curs.lastrowid
     conn.commit()
     print("conductSqlQuery function done")
     print("--------------------------------")
-
+    return consolePostId
+    
 def lambda_handler(event, context):
     try:
         print("--------------------------------")
-        print("createConsole lambda_handler function init")
+        print("createConsolePost lambda_handler function init")
         print("event : ",event)
         
         data=json.loads(event['body'])
-        request=data['request']
+        
+        title=data['title']
+        contents=data['contents']
         email=data['email']
-        print(f"request : {request}   email : {email}")
+        anonymous=data['anonymous']
+        mainCategory=data['mainCategory']
+        subCategory=data['subCategory']
+        print(f"title : {title}   contents : {contents}   anonymous : {anonymous}   mainCategory : {mainCategory}   subCategory : {subCategory}")
+        
+        
+        
+        
+        comprehend = boto3.client(service_name='comprehend', region_name='ap-northeast-2',aws_access_key_id='AKIAUI2WSCLQZYBOH6L7', aws_secret_access_key='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')
+        retVal=comprehend.detect_sentiment(Text=contents, LanguageCode='ko')
+        
+        
+        
+        sentimentScore=retVal['SentimentScore']
+        positive=sentimentScore['Positive']
+        negative=sentimentScore['Negative']
+        
+        
+        sql = "INSERT INTO ConsolePost(title,contents,email,anonymous,mainCategory,subCategory,positive,negative) VALUES(%(title)s,%(contents)s,%(email)s,%(anonymous)s,%(mainCategory)s,%(subCategory)s,%(positive)s,%(negative)s)"
+        sqlData={
+            'title':title,
+            'contents':contents,
+            'email':email,
+            'anonymous':anonymous,
+            'mainCategory':mainCategory,
+            'subCategory':subCategory,
+            'positive':positive,
+            'negative':negative
+        }
+        consolePostId=conductSqlQuery(sql,sqlData)
+        print("consolePostId : ",consolePostId )
         
         headers = {'Content-Type': 'application/json; charset=utf-8'}
-        retVal=requests.post('https://0mo7o614ha.execute-api.ap-northeast-2.amazonaws.com/dev/console-chatbot', headers=headers,timeout=60,json={'request':request})
-        print("retVal : ",retVal.json())
-        retVal=retVal.json()
+        requests.post('https://x3zh92gyl0.execute-api.ap-northeast-2.amazonaws.com/default/console-post', headers=headers,timeout=100,json={'contents':contents,'consolePostId':consolePostId})
         
-        
-        
-        response=retVal['response']
-        division=retVal['division']
-        simRequest=retVal['simRequest']
-        simRate=retVal['simRate'] 
-        
-
-        
-        sql = "INSERT INTO ConsoleBot(request,response,email,division,simRequest,simRate) VALUES(%(request)s,%(response)s,%(email)s,%(division)s,%(simRequest)s,%(simRate)s)"
-        sqlData={
-            'request':request,
-            'response':response,
-            'email':email,
-            'division':division,
-            'simRequest':simRequest,
-            'simRate':simRate
+        result={'statusCode':HTTPStatus.OK,'headers': {
+                'Access-Control-Allow-Origin': '*',
+            }
         }
-        conductSqlQuery(sql,sqlData)
-        
-        retVal['request']=request
-        retVal['email']=email
-        
-        
-        result={
-        'statusCode':HTTPStatus.OK,
-        'headers': {
-            'Access-Control-Allow-Origin': '*',
-        },
-        'body':json.dumps(retVal),
-        }
-        
-        print("createConsole lambda_handler function done")
+        print("createConsolePost lambda_handler function done")
         print("--------------------------------")
         return result
     except Exception:
