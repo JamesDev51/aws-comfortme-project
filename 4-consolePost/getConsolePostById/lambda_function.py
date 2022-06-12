@@ -42,24 +42,11 @@ def lambda_handler(event, context):
         print("event : ",event)
         params=event['queryStringParameters']
 
-        category=params['mainCategory']
-        page=params['page']
-        print("mainCategory : ",category, "page : ",page)
+        consolePostId=params['consolePostId']
+        print("consolePostId : ",consolePostId)
         
-        mainCategory,subCategory=category.split("/")
-        mainCategory=f"%{mainCategory}%"
-        subCategory=f"%{subCategory}%"
-        
-        limit=str((int(page)+1)*10-1)
-        offset=str(int(page)*10)
-        
-        
-        sql = f"SELECT * FROM ConsolePost WHERE (mainCategory LIKE %(mainCategory)s  OR subCategory LIKE %(subCategory)s) ORDER BY createdAt DESC LIMIT {limit} OFFSET {offset}"
-        sqlData={
-            'mainCategory':mainCategory,
-            'subCategory':subCategory
-        }
-        retValue=conductSqlQuery(sql,sqlData)
+        sql = f"SELECT * FROM ConsolePost WHERE consolePostId=%s"
+        retValue=conductSqlQuery(sql,consolePostId)
         
         result={
             'statusCode':HTTPStatus.OK,

@@ -26,10 +26,12 @@ def  conductSqlQuery(sql, sqlData):
     conn=getMysqlConn()
     curs = conn.cursor()
     curs.execute(sql, sqlData)
+    consolePostId=curs.lastrowid
     conn.commit()
     print("conductSqlQuery function done")
     print("--------------------------------")
-
+    return consolePostId
+    
 def lambda_handler(event, context):
     try:
         print("--------------------------------")
@@ -46,8 +48,14 @@ def lambda_handler(event, context):
         subCategory=data['subCategory']
         print(f"title : {title}   contents : {contents}   anonymous : {anonymous}   mainCategory : {mainCategory}   subCategory : {subCategory}")
         
+        
+        
+        
         comprehend = boto3.client(service_name='comprehend', region_name='ap-northeast-2',aws_access_key_id='AKIAUI2WSCLQZYBOH6L7', aws_secret_access_key='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')
         retVal=comprehend.detect_sentiment(Text=contents, LanguageCode='ko')
+        
+        
+        
         sentimentScore=retVal['SentimentScore']
         positive=sentimentScore['Positive']
         negative=sentimentScore['Negative']
@@ -64,8 +72,14 @@ def lambda_handler(event, context):
             'positive':positive,
             'negative':negative
         }
-        conductSqlQuery(sql,sqlData)
+        consolePostId=conductSqlQuery(sql,sqlData)
+        print("consolePostId : ",consolePostId )
         
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
+        requests.post('https://7f6calrfce.execute-api.ap-northeast-2.amazonaws.com/dev/console-post', headers=headers,timeout=3000,json={"contents":contents,"consolePostId":consolePostId})
+        print("consolePost embedding generated")
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
+        requests.post('https://7f6calrfce.execute-api.ap-northeast-2.amazonaws.com/dev/updateUserEmbedding', headers=headers,timeout=3000,json={"email":email,"consolePostId":consolePostId})
         
         result={'statusCode':HTTPStatus.OK,'headers': {
                 'Access-Control-Allow-Origin': '*',
