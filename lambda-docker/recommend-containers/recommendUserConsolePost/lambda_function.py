@@ -45,13 +45,13 @@ def handler(event, context):
         
         sql = "SELECT * FROM UserEmbedding WHERE email=%s"
         user=conductSqlQuery(sql,email)
-        user=user[0]
         if len(user)==0:
             return  {
             'statusCode':200,
             'body': "아직 고민글을 한번도 작성하지 않으셨어요! 추천해드릴만한 고민글이 없네요",
             'headers': {
                 'Access-Control-Allow-Origin': '*'}}
+        user=user[0]
         
         userBertEmbedding=np.fromstring(user['bertEmbedding'].replace('[','').replace(']',''),sep=', ')
         print("userBertEmbedding:", userBertEmbedding)

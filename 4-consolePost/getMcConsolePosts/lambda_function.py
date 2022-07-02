@@ -54,7 +54,8 @@ def lambda_handler(event, context):
         offset=str(int(page)*10)
         
         
-        sql = f"SELECT * FROM ConsolePost WHERE (mainCategory LIKE %(mainCategory)s  OR subCategory LIKE %(subCategory)s) ORDER BY createdAt DESC LIMIT {limit} OFFSET {offset}"
+        # sql = f"SELECT * FROM ConsolePost WHERE (mainCategory LIKE %(mainCategory)s  OR subCategory LIKE %(subCategory)s) ORDER BY createdAt DESC LIMIT {limit} OFFSET {offset}"
+        sql = f"select cp.*, (select count(*) from Comment c where c.consolePostId=cp.consolePostId) as commentCount,(select count(*) from CheerUp ch where ch.consolePostId=cp.consolePostId) as cheerUpCount from ConsolePost cp WHERE (cp.mainCategory LIKE %(mainCategory)s  OR cp.subCategory LIKE %(subCategory)s) ORDER BY cp.createdAt DESC LIMIT {limit} OFFSET {offset}"
         sqlData={
             'mainCategory':mainCategory,
             'subCategory':subCategory
